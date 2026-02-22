@@ -2,23 +2,41 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Menu, X, Globe, ChevronDown, Check, Home } from 'lucide-react';
+// ✅ แก้ไขแล้ว: เพิ่ม ../ เป็น 2 ชุด เพื่อถอยหลัง 2 ชั้นออกไปหาโฟลเดอร์ context
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
   
+  const { lang, changeLanguage } = useLanguage(); 
   const router = useRouter();
-  
-  // Logic: ตรวจสอบว่าอยู่หน้าภาษาไทยหรือไม่
-  const isThai = router.pathname.startsWith('/th');
-  const currentLang = isThai ? 'TH' : 'EN';
-  
-  // Logic: สร้าง Prefix สำหรับลิงก์ (/th หรือ ว่างเปล่า)
-  const linkPrefix = isThai ? '/th' : '';
 
-  // Logic: เช็คว่าเป็นหน้าแรกหรือไม่
-  const isHomePage = router.pathname === '/' || router.pathname === '/th';
+  const languages = [
+    { code: 'EN', label: 'English', flag: '🇬🇧' },
+    { code: 'TH', label: 'ภาษาไทย', flag: '🇹🇭' },
+    { code: 'CN', label: '简体中文', flag: '🇨🇳' },
+    { code: 'RU', label: 'Русский', flag: '🇷🇺' },
+    { code: 'JP', label: '日本語', flag: '🇯🇵' },
+    { code: 'DE', label: 'Deutsch', flag: '🇩🇪' },
+  ];
+
+  const content = {
+    EN: { home: 'HOME', room: 'ACCOMMODATION', fac: 'FACILITIES', dine: 'DINING', gall: 'GALLERY', contact: 'CONTACT US', book: 'BOOK NOW' },
+    TH: { home: 'หน้าแรก', room: 'ห้องพัก', fac: 'สิ่งอำนวยความสะดวก', dine: 'อาหารและเครื่องดื่ม', gall: 'แกลเลอรี', contact: 'ติดต่อเรา', book: 'จองห้องพัก' },
+    CN: { home: '首页', room: '客房住宿', fac: '酒店设施', dine: '餐饮美食', gall: '图库', contact: '联系我们', book: '立即预订' },
+    RU: { home: 'ГЛАВНАЯ', room: 'НОМЕРА', fac: 'УСЛУГИ', dine: 'ПИТАНИЕ', gall: 'ГАЛЕРЕЯ', contact: 'КОНТАКТЫ', book: 'ЗАБРОНИРОВАТЬ' },
+    JP: { home: 'ホーム', room: '宿泊施設', fac: '施設', dine: 'ダイニング', gall: 'ギャラリー', contact: 'お問い合わせ', book: '今すぐ予約' },
+    DE: { home: 'STARTSEITE', room: 'UNTERKUNFT', fac: 'ANLAGEN', dine: 'GASTRONOMIE', gall: 'GALERIE', contact: 'KONTAKT', book: 'JETZT BUCHEN' }
+  };
+
+  const t = (key) => {
+    if (content[lang] && content[lang][key]) {
+      return content[lang][key];
+    }
+    return content['EN'][key];
+  };
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -26,77 +44,69 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Function: สลับภาษา (Redirect ไปหน้าคู่ขนาน)
-  const toggleLanguage = (targetLang) => {
-    setIsLangOpen(false);
-    if (targetLang === currentLang) return;
-
-    let newPath;
-    if (targetLang === 'TH') {
-      // เปลี่ยนจาก EN -> TH (เติม /th ข้างหน้า)
-      newPath = router.pathname === '/' ? '/th' : `/th${router.pathname}`;
-    } else {
-      // เปลี่ยนจาก TH -> EN (ลบ /th ออก)
-      newPath = router.pathname.replace('/th', '') || '/';
-    }
-    router.push(newPath);
+  const toggleLanguage = (code) => {
+    changeLanguage(code); 
+    setIsLangOpen(false); 
   };
 
+  const isHomePage = router.pathname === '/';
   const isTransparent = isHomePage && !isScrolled;
+  
   const navClass = isTransparent 
     ? 'bg-gradient-to-b from-black/80 to-transparent text-white shadow-none' 
     : 'bg-gray-800 text-white shadow-md'; 
 
-  const logoBg = 'bg-white p-1 rounded-sm'; 
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
     <>
       <nav className={`fixed w-full z-50 transition-all duration-500 py-2 md:py-3 ${navClass}`}>
-        <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div className="container mx-auto px-4 md:px-6 flex justify-between items-center text-left">
           
-          {/* Logo Link */}
-          <Link href={isThai ? "/th" : "/"}>
+          <Link href="/">
             <div className="cursor-pointer">
-               <img src="/images/logo-01.jpg" alt="The Old Phuket" className={`h-10 md:h-16 w-auto object-contain ${logoBg}`} />
+               <img src="/images/logo-01.jpg" alt="The Old Phuket" className="h-10 md:h-16 w-auto object-contain bg-white p-1 rounded-sm" />
             </div>
           </Link>
 
-          {/* Right Menu */}
           <div className="flex items-center space-x-3 md:space-x-6">
             
-            {/* Home Button */}
-            <Link href={isThai ? "/th" : "/"}>
-               <button className="hidden md:flex items-center justify-center hover:text-[#E5C595] transition-colors text-white" title="Back to Home">
+            <Link href="/">
+               <button className="hidden md:flex items-center justify-center hover:text-[#E5C595] transition-colors text-white" title={t('home')}>
                  <Home size={22} />
                </button>
             </Link>
             
-            {/* Language Selector */}
             <div className="relative">
-              <button onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center text-xs md:text-sm font-medium transition-colors focus:outline-none hover:text-[#E5C595] text-white">
-                <Globe size={18} className="mr-1" /> {currentLang} <ChevronDown size={12} className="ml-1" />
+              <button 
+                onClick={() => setIsLangOpen(!isLangOpen)} 
+                className="flex items-center text-[11px] font-bold uppercase tracking-widest transition-colors hover:text-[#E5C595] text-white"
+              >
+                <Globe size={16} className="mr-2 text-[#E5C595]" /> {lang} <ChevronDown size={12} className="ml-1" />
               </button>
+
               {isLangOpen && (
-                <div className="absolute right-0 mt-2 w-32 bg-white text-gray-800 rounded shadow-xl py-2 z-50 border border-gray-700">
-                  <button onClick={() => toggleLanguage('EN')} className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100">
-                    <span className="w-6">{currentLang === 'EN' && <Check size={14} className="text-[#E5C595]"/>}</span> English
-                  </button>
-                  <button onClick={() => toggleLanguage('TH')} className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100">
-                    <span className="w-6">{currentLang === 'TH' && <Check size={14} className="text-[#E5C595]"/>}</span> ภาษาไทย
-                  </button>
+                <div className="absolute right-0 mt-3 w-44 bg-white text-gray-800 rounded-sm shadow-2xl py-2 z-50 border border-gray-100 animate-in fade-in slide-in-from-top-2">
+                  {languages.map((l) => (
+                    <button 
+                      key={l.code}
+                      onClick={() => toggleLanguage(l.code)} 
+                      className="flex items-center justify-between w-full px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors"
+                    >
+                      <span className={lang === l.code ? 'text-[#E5C595]' : 'text-gray-600'}>{l.label}</span>
+                      <span className="text-sm">{l.flag}</span>
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* ✅ แก้ไข: Book Now ให้ชี้ไปหน้า /search */}
-            <Link href={`${linkPrefix}/search`}>
-               <button className="bg-[#E5C595] hover:bg-[#d4b07e] text-white px-3 py-1.5 md:px-6 md:py-2 uppercase text-[10px] md:text-xs font-bold tracking-widest rounded-sm transition-all shadow-md border border-transparent whitespace-nowrap">
-                 {isThai ? 'จองห้องพัก' : 'Book Now'}
+            <Link href="/search">
+               <button className="bg-[#E5C595] hover:bg-white hover:text-[#E5C595] text-white px-3 py-1.5 md:px-6 md:py-2 uppercase text-[10px] md:text-xs font-black tracking-[0.2em] rounded-sm transition-all shadow-lg border border-transparent whitespace-nowrap">
+                 {t('book')}
                </button>
             </Link>
 
-            {/* Hamburger */}
             <button onClick={() => setIsMenuOpen(true)} className="hover:text-[#E5C595] transition-colors text-white">
               <Menu size={28} />
             </button>
@@ -104,19 +114,18 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Full Screen Menu */}
-      <div className={`fixed inset-0 bg-gray-900 bg-opacity-95 z-50 transform transition-transform duration-500 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`fixed inset-0 bg-gray-900 bg-opacity-98 z-[60] transform transition-transform duration-500 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="absolute top-6 right-6">
           <button onClick={closeMenu} className="text-white hover:text-[#E5C595]"><X size={32} /></button>
         </div>
         
-        <div className="flex flex-col items-center justify-center h-full space-y-8 text-white text-2xl md:text-3xl font-light tracking-widest">
-          <Link href={isThai ? "/th" : "/"} onClick={closeMenu} className="hover:text-[#E5C595] transition-colors">{isThai ? 'หน้าแรก' : 'HOME'}</Link>
-          <Link href={`${linkPrefix}/accommodation`} onClick={closeMenu} className="hover:text-[#E5C595] transition-colors">{isThai ? 'ห้องพัก' : 'ACCOMMODATION'}</Link>
-          <Link href={`${linkPrefix}/facilities`} onClick={closeMenu} className="hover:text-[#E5C595] transition-colors">{isThai ? 'สิ่งอำนวยความสะดวก' : 'FACILITIES'}</Link>
-          <Link href={`${linkPrefix}/dining`} onClick={closeMenu} className="hover:text-[#E5C595] transition-colors">{isThai ? 'อาหารและเครื่องดื่ม' : 'DINING'}</Link>
-          <Link href={`${linkPrefix}/gallery`} onClick={closeMenu} className="hover:text-[#E5C595] transition-colors">{isThai ? 'แกลเลอรี' : 'GALLERY'}</Link>
-          <Link href={`${linkPrefix}/contact`} onClick={closeMenu} className="hover:text-[#E5C595] transition-colors">{isThai ? 'ติดต่อเรา' : 'CONTACT US'}</Link>
+        <div className="flex flex-col items-center justify-center h-full space-y-8 text-white text-xl md:text-2xl font-serif tracking-[0.3em] uppercase">
+          <Link href="/" onClick={closeMenu} className="hover:text-[#E5C595] transition-colors">{t('home')}</Link>
+          <Link href="/accommodation" onClick={closeMenu} className="hover:text-[#E5C595] transition-colors">{t('room')}</Link>
+          <Link href="/facilities" onClick={closeMenu} className="hover:text-[#E5C595] transition-colors">{t('fac')}</Link>
+          <Link href="/dining" onClick={closeMenu} className="hover:text-[#E5C595] transition-colors">{t('dine')}</Link>
+          <Link href="/gallery" onClick={closeMenu} className="hover:text-[#E5C595] transition-colors">{t('gall')}</Link>
+          <Link href="/contact" onClick={closeMenu} className="hover:text-[#E5C595] transition-colors">{t('contact')}</Link>
         </div>
       </div>
     </>

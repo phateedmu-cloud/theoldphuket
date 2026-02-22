@@ -2,10 +2,22 @@ import React from 'react';
 import Head from 'next/head';
 import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
 
+// ✅ 1. Import สมองส่วนกลางและคลังคำแปล
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../data/translations';
+
 export default function Contact() {
   const themeColor = '#E5C595';
 
-  // --- AI-READY: Structured Data for Local Business ---
+  // ✅ 2. เรียกใช้งานระบบแปลภาษา
+  const { lang } = useLanguage();
+  const t = (key, fallbackText) => {
+    if (translations[lang] && translations[lang][key]) {
+      return translations[lang][key];
+    }
+    return translations['EN']?.[key] || fallbackText || key;
+  };
+
   const contactSchema = {
     "@context": "https://schema.org",
     "@type": "Hotel",
@@ -40,12 +52,7 @@ export default function Contact() {
       <Head>
         <title>Contact Us - The Old Phuket | AI Ready Hotel</title>
         <meta name="description" content="Contact The Old Phuket at Karon Beach. Find our location, phone number, and email. We are open 24/7 to serve you." />
-        
-        {/* ✅ ฝังโค้ด AI Schema ข้อมูลติดต่อ */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(contactSchema) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(contactSchema) }} />
       </Head>
 
       {/* --- HERO HEADER --- */}
@@ -57,10 +64,12 @@ export default function Contact() {
             className="w-full h-full object-cover opacity-60"
           />
         </div>
-        <div className="relative z-10 text-center text-white px-4">
-          <p className="text-sm uppercase tracking-[0.3em] mb-4 text-[#E5C595]">Get in Touch</p>
-          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-4 drop-shadow-lg">
-            CONTACT US
+        <div className="relative z-10 text-center text-white px-4 pt-16">
+          <p className="text-sm uppercase tracking-[0.3em] mb-4 text-[#E5C595]">
+            {t('cont_hero_subtitle', 'Get in Touch')}
+          </p>
+          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-4 drop-shadow-lg uppercase">
+            {t('cont_hero_title', 'CONTACT US')}
           </h1>
           <div className="w-24 h-1 mx-auto bg-[#E5C595]"></div>
         </div>
@@ -75,10 +84,9 @@ export default function Contact() {
             <div className="w-16 h-16 mx-auto bg-gray-50 rounded-full flex items-center justify-center text-[#E5C595] mb-6">
               <MapPin size={32} />
             </div>
-            <h3 className="text-xl font-serif font-bold mb-4">Our Location</h3>
+            <h3 className="text-xl font-serif font-bold mb-4">{t('cont_loc_title', 'Our Location')}</h3>
             <p className="text-gray-500 font-light leading-relaxed">
-              128/1 Karon Road, Muang,<br/>
-              Phuket 83100, Thailand
+              {t('cont_loc_desc', '128/1 Karon Road, Muang, Phuket 83100, Thailand')}
             </p>
           </div>
 
@@ -87,12 +95,12 @@ export default function Contact() {
             <div className="w-16 h-16 mx-auto bg-gray-50 rounded-full flex items-center justify-center text-[#E5C595] mb-6">
               <Phone size={32} />
             </div>
-            <h3 className="text-xl font-serif font-bold mb-4">Contact Info</h3>
+            <h3 className="text-xl font-serif font-bold mb-4">{t('cont_info_title', 'Contact Info')}</h3>
             <p className="text-gray-500 font-light mb-2">
-              <span className="font-bold">Tel:</span> +66 76 123 456
+              <span className="font-bold">{t('cont_info_tel', 'Tel')}:</span> +66 76 123 456
             </p>
             <p className="text-gray-500 font-light">
-              <span className="font-bold">Email:</span> info@theoldphuket.com
+              <span className="font-bold">{t('cont_info_email', 'Email')}:</span> info@theoldphuket.com
             </p>
           </div>
 
@@ -101,10 +109,10 @@ export default function Contact() {
             <div className="w-16 h-16 mx-auto bg-gray-50 rounded-full flex items-center justify-center text-[#E5C595] mb-6">
               <Clock size={32} />
             </div>
-            <h3 className="text-xl font-serif font-bold mb-4">Reception Hours</h3>
+            <h3 className="text-xl font-serif font-bold mb-4">{t('cont_hours_title', 'Reception Hours')}</h3>
             <p className="text-gray-500 font-light leading-relaxed">
-              Open 24 Hours<br/>
-              Check-in: 14:00 | Check-out: 12:00
+              {t('cont_hours_desc', 'Open 24 Hours')}<br/>
+              {t('cont_hours_check', 'Check-in: 14:00 | Check-out: 12:00')}
             </p>
           </div>
 
@@ -115,10 +123,10 @@ export default function Contact() {
       <div className="container mx-auto px-6 pb-24">
         <div className="flex flex-col lg:flex-row gap-16">
           
-          {/* LEFT: Google Map (แก้ไขพิกัดเป็น Karon Beach) */}
+          {/* LEFT: Google Map */}
           <div className="lg:w-1/2 h-[500px] bg-gray-200 shadow-lg rounded-sm overflow-hidden">
             <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15809.683707204946!2d98.29074555!3d7.84277715!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30502f61eac8c247%3A0x66596163351d530!2sKaron%20Beach!5e0!3m2!1sen!2sth!4v1700000000000!5m2!1sen!2sth" 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15814.73949826315!2d98.28639205!3d7.84277715!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30502e1b1a111111%3A0x1111111111111111!2sThe%20Old%20Phuket%20Karon%20Beach%20Resort!5e0!3m2!1sen!2sth!4v1700000000000!5m2!1sen!2sth" 
               width="100%" 
               height="100%" 
               style={{ border: 0 }} 
@@ -130,33 +138,33 @@ export default function Contact() {
 
           {/* RIGHT: Contact Form */}
           <div className="lg:w-1/2">
-            <h3 className="text-sm font-bold tracking-widest uppercase text-gray-400 mb-2">Send us a message</h3>
-            <h2 className="text-4xl font-serif font-bold text-gray-800 mb-8">We'd love to hear from you</h2>
+            <h3 className="text-sm font-bold tracking-widest uppercase text-gray-400 mb-2">{t('cont_form_subtitle', 'Send us a message')}</h3>
+            <h2 className="text-4xl font-serif font-bold text-gray-800 mb-8">{t('cont_form_title', "We'd love to hear from you")}</h2>
             
             <form className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Your Name</label>
-                  <input type="text" className="w-full border-b border-gray-300 py-3 focus:border-[#E5C595] focus:outline-none transition-colors" placeholder="John Doe" />
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">{t('cont_label_name', 'Your Name')}</label>
+                  <input type="text" className="w-full border-b border-gray-300 py-3 focus:border-[#E5C595] focus:outline-none transition-colors" placeholder={t('cont_ph_name', 'John Doe')} />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Email Address</label>
-                  <input type="email" className="w-full border-b border-gray-300 py-3 focus:border-[#E5C595] focus:outline-none transition-colors" placeholder="email@example.com" />
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">{t('cont_label_email', 'Email Address')}</label>
+                  <input type="email" className="w-full border-b border-gray-300 py-3 focus:border-[#E5C595] focus:outline-none transition-colors" placeholder={t('cont_ph_email', 'email@example.com')} />
                 </div>
               </div>
               
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Subject</label>
-                <input type="text" className="w-full border-b border-gray-300 py-3 focus:border-[#E5C595] focus:outline-none transition-colors" placeholder="Booking Inquiry" />
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">{t('cont_label_subject', 'Subject')}</label>
+                <input type="text" className="w-full border-b border-gray-300 py-3 focus:border-[#E5C595] focus:outline-none transition-colors" placeholder={t('cont_ph_subject', 'Booking Inquiry')} />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Message</label>
-                <textarea rows="4" className="w-full border-b border-gray-300 py-3 focus:border-[#E5C595] focus:outline-none transition-colors" placeholder="How can we help you?"></textarea>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">{t('cont_label_message', 'Message')}</label>
+                <textarea rows="4" className="w-full border-b border-gray-300 py-3 focus:border-[#E5C595] focus:outline-none transition-colors" placeholder={t('cont_ph_message', 'How can we help you?')}></textarea>
               </div>
 
               <button className="bg-gray-900 text-white px-10 py-4 uppercase font-bold tracking-widest text-sm hover:bg-[#E5C595] transition-colors flex items-center mt-4">
-                Send Message <Send size={16} className="ml-2" />
+                {t('cont_btn_send', 'Send Message')} <Send size={16} className="ml-2" />
               </button>
             </form>
           </div>

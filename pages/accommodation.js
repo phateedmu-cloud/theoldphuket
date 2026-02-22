@@ -1,8 +1,24 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/router'; // ✅ เพิ่ม useRouter สำหรับปุ่ม
 import { ChevronRight, ChevronLeft, Users, Maximize, Bed, Sun } from 'lucide-react';
 
+// ✅ 1. Import สมองส่วนกลางและคลังคำแปล
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../data/translations';
+
 export default function Accommodation() {
+  const router = useRouter();
+  
+  // ✅ 2. เรียกใช้งานระบบแปลภาษา
+  const { lang } = useLanguage();
+  const t = (key, fallbackText) => {
+    if (translations[lang] && translations[lang][key]) {
+      return translations[lang][key];
+    }
+    return translations['EN']?.[key] || fallbackText || key;
+  };
+
   const rooms = [
     {
       id: 1,
@@ -11,7 +27,8 @@ export default function Accommodation() {
       guests: "2 Adults",
       bed: "King / Twin",
       view: "Garden / City",
-      desc: "Experience the charm of Sino-Portuguese architecture blended with modern comfort. This spacious room features a private balcony and all essential amenities for a relaxing stay.",
+      descKey: "desc_deluxe", // ✅ ชี้เป้าไปที่คีย์แปลภาษา
+      fallbackDesc: "Experience the charm of Sino-Portuguese architecture blended with modern comfort. This spacious room features a private balcony and all essential amenities for a relaxing stay.",
       images: [
         "/images/rooms/deluxe/01.jpg",
         "/images/rooms/deluxe/02.jpg",
@@ -26,7 +43,8 @@ export default function Accommodation() {
       guests: "2 Adults",
       bed: "King / Twin",
       view: "Swimming Pool",
-      desc: "Enjoy stunning views of our sparkling swimming pool from your private balcony. The room offers a bright and airy atmosphere, perfect for unwinding after a day at the beach.",
+      descKey: "desc_pool_view",
+      fallbackDesc: "Enjoy stunning views of our sparkling swimming pool from your private balcony. The room offers a bright and airy atmosphere, perfect for unwinding after a day at the beach.",
       images: [
         "/images/rooms/deluxe-pool-view/01.jpg",
         "/images/rooms/deluxe-pool-view/02.jpg",
@@ -41,7 +59,8 @@ export default function Accommodation() {
       guests: "2 Adults",
       bed: "King",
       view: "Garden Terrace",
-      desc: "Located on the ground floor, this room features a spacious private terrace with direct access to the lush garden. Ideal for those who love outdoor relaxation.",
+      descKey: "desc_terrace",
+      fallbackDesc: "Located on the ground floor, this room features a spacious private terrace with direct access to the lush garden. Ideal for those who love outdoor relaxation.",
       images: [
         "/images/rooms/deluxe-terrace/01.jpg",
         "/images/rooms/deluxe-terrace/02.jpg",
@@ -56,7 +75,8 @@ export default function Accommodation() {
       guests: "2 Adults",
       bed: "King",
       view: "Pool Access",
-      desc: "The ultimate resort experience. Step directly from your private terrace into the refreshing swimming pool. Perfect for couples and water lovers.",
+      descKey: "desc_pool_access",
+      fallbackDesc: "The ultimate resort experience. Step directly from your private terrace into the refreshing swimming pool. Perfect for couples and water lovers.",
       images: [
         "/images/rooms/deluxe-pool-access/01.jpg",
         "/images/rooms/deluxe-pool-access/02.jpg",
@@ -71,7 +91,8 @@ export default function Accommodation() {
       guests: "2 Adults",
       bed: "King",
       view: "Private Jacuzzi",
-      desc: "Indulge in luxury with your very own private jacuzzi on the balcony. Create romantic memories in a secluded and serene atmosphere.",
+      descKey: "desc_jacuzzi",
+      fallbackDesc: "Indulge in luxury with your very own private jacuzzi on the balcony. Create romantic memories in a secluded and serene atmosphere.",
       images: [
         "/images/rooms/jacuzzi-deluxe/01.jpg",
         "/images/rooms/jacuzzi-deluxe/02.jpg",
@@ -86,7 +107,8 @@ export default function Accommodation() {
       guests: "2 Adults + 2 Kids",
       bed: "King + Bunk Beds",
       view: "Garden / Pool",
-      desc: "Designed with families in mind, this room features a king-sized bed for parents and fun bunk beds for the kids. Spacious and comfortable for everyone.",
+      descKey: "desc_family",
+      fallbackDesc: "Designed with families in mind, this room features a king-sized bed for parents and fun bunk beds for the kids. Spacious and comfortable for everyone.",
       images: [
         "/images/rooms/family-deluxe/01.jpg",
         "/images/rooms/family-deluxe/02.jpg",
@@ -104,7 +126,7 @@ export default function Accommodation() {
     "containsPlace": rooms.map(room => ({
       "@type": "HotelRoom",
       "name": room.name,
-      "description": room.desc,
+      "description": room.fallbackDesc, // ให้ Bot อ่านภาษาอังกฤษ
       "image": `https://theoldphuket.vercel.app${room.images[0]}`,
       "floorSize": {
         "@type": "QuantitativeValue",
@@ -150,9 +172,13 @@ export default function Accommodation() {
         <div className="absolute inset-0">
           <img src="/images/rooms/deluxe-pool-access/01.jpg" alt="Accommodation Hero" className="w-full h-full object-cover opacity-60"/>
         </div>
-        <div className="relative z-10 text-center text-white px-4">
-          <p className="text-sm uppercase tracking-[0.3em] mb-4 text-[#E5C595]">Your Sanctuary</p>
-          <h1 className="text-5xl md:text-6xl font-serif font-bold mb-4 drop-shadow-lg uppercase">Rooms & Suites</h1>
+        <div className="relative z-10 text-center text-white px-4 pt-16">
+          <p className="text-sm uppercase tracking-[0.3em] mb-4 text-[#E5C595]">
+            {t('choose_sanctuary', 'Your Sanctuary')} {/* ✅ แปลภาษา */}
+          </p>
+          <h1 className="text-5xl md:text-6xl font-serif font-bold mb-4 drop-shadow-lg uppercase">
+            {t('rooms_and_suites', 'Rooms & Suites')} {/* ✅ แปลภาษา (เดี๋ยวต้องไปเพิ่มใน translations.js) */}
+          </h1>
           <div className="w-24 h-1 mx-auto bg-[#E5C595]"></div>
         </div>
       </div>
@@ -174,9 +200,13 @@ export default function Accommodation() {
                    {String(index + 1).padStart(2, '0')}
                  </div>
 
+                 {/* ชื่อห้องเป็นภาษาอังกฤษเสมอ */}
                  <h3 className="text-3xl font-serif font-bold text-gray-800 mb-6 uppercase tracking-tight">{room.name}</h3>
                  
-                 <p className="text-gray-500 font-light mb-8 leading-relaxed italic border-l-2 border-[#E5C595] pl-4">{room.desc}</p>
+                 {/* ✅ แปลคำอธิบายห้อง */}
+                 <p className="text-gray-500 font-light mb-8 leading-relaxed italic border-l-2 border-[#E5C595] pl-4">
+                   {t(room.descKey, room.fallbackDesc)}
+                 </p>
 
                  {/* Icons Grid */}
                  <div className="grid grid-cols-2 gap-y-4 gap-x-8 mb-8 border-t border-b border-gray-100 py-6">
@@ -187,8 +217,11 @@ export default function Accommodation() {
                  </div>
 
                  <div className="flex">
-                   <button className="bg-gray-900 text-white px-10 py-4 uppercase text-xs font-bold tracking-[0.2em] hover:bg-[#E5C595] transition-colors flex-1 shadow-lg">
-                     Request Availability
+                   <button 
+                     onClick={() => router.push('/search')} // ✅ กดแล้วไปหน้า Search
+                     className="bg-gray-900 text-white px-10 py-4 uppercase text-xs font-bold tracking-[0.2em] hover:bg-[#E5C595] hover:text-gray-900 transition-all flex-1 shadow-lg"
+                   >
+                     {t('check_availability', 'Request Availability')} {/* ✅ แปลปุ่ม */}
                    </button>
                  </div>
               </div>

@@ -2,14 +2,25 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 import { Image as ImageIcon, X } from 'lucide-react';
 
+// ✅ 1. Import สมองส่วนกลางและคลังคำแปล
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../data/translations';
+
 export default function Gallery() {
   const themeColor = '#E5C595';
   
-  // 🚩 State
-  const [filter, setFilter] = useState('All');
-  const [selectedImage, setSelectedImage] = useState(null); // State สำหรับเปิดดูรูปใหญ่ (Lightbox)
+  // ✅ 2. เรียกใช้งานระบบแปลภาษา
+  const { lang } = useLanguage();
+  const t = (key, fallbackText) => {
+    if (translations[lang] && translations[lang][key]) {
+      return translations[lang][key];
+    }
+    return translations['EN']?.[key] || fallbackText || key;
+  };
 
-  // 1. สร้างรายการรูปภาพหมวด "Rooms" แบบเยอะๆ (ห้องละ 4 รูป)
+  const [filter, setFilter] = useState('All');
+  const [selectedImage, setSelectedImage] = useState(null); 
+
   const roomTypes = [
     { folder: 'deluxe', name: 'Deluxe Room' },
     { folder: 'deluxe-pool-view', name: 'Deluxe Pool View' },
@@ -27,7 +38,6 @@ export default function Gallery() {
     }))
   );
 
-  // 2. รายการรูปภาพหมวด "Hotel" & "Facilities" (จัดเต็ม)
   const otherImages = [
     // --- HOTEL ---
     { src: "/images/hotel/exterior-01.jpg", category: "Hotel", alt: "Modern Poolside Facade" },
@@ -48,17 +58,20 @@ export default function Gallery() {
     { src: "/images/facilities/pool-02.jpg", category: "Facilities", alt: "Relaxing Pool" },
   ];
 
-  // รวมรูปทั้งหมดเข้าด้วยกัน
   const allImages = [...otherImages, ...roomImages].map((img, index) => ({ ...img, id: index + 1 }));
 
-  // กรองรูปภาพตามหมวดหมู่
   const filteredImages = filter === 'All' 
     ? allImages 
     : allImages.filter(img => img.category === filter);
 
-  const categories = ['All', 'Hotel', 'Rooms', 'Facilities'];
+  // ✅ เปลี่ยน Array Category ให้ไปดึงคำแปลด้วย
+  const categories = [
+    { key: 'All', transKey: 'filter_all' },
+    { key: 'Hotel', transKey: 'filter_hotel' },
+    { key: 'Rooms', transKey: 'filter_rooms' },
+    { key: 'Facilities', transKey: 'filter_facilities' }
+  ];
 
-  // --- AI-READY: Structured Data for Image Gallery ---
   const gallerySchema = {
     "@context": "https://schema.org",
     "@type": "ImageGallery",
@@ -77,12 +90,7 @@ export default function Gallery() {
       <Head>
         <title>Gallery - The Old Phuket | AI Ready Hotel</title>
         <meta name="description" content="Browse our gallery to see the beauty of The Old Phuket, from Sino-Portuguese architecture to modern pool access rooms." />
-        
-        {/* ✅ ฝังโค้ด AI Schema แกลเลอรี */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(gallerySchema) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(gallerySchema) }} />
       </Head>
 
       {/* --- HERO HEADER --- */}
@@ -94,10 +102,12 @@ export default function Gallery() {
             className="w-full h-full object-cover opacity-60"
           />
         </div>
-        <div className="relative z-10 text-center text-white px-4">
-          <p className="text-sm uppercase tracking-[0.3em] mb-4 text-[#E5C595]">Visual Journey</p>
-          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-4 drop-shadow-lg">
-            OUR GALLERY
+        <div className="relative z-10 text-center text-white px-4 pt-16">
+          <p className="text-sm uppercase tracking-[0.3em] mb-4 text-[#E5C595]">
+            {t('gall_hero_subtitle', 'Visual Journey')}
+          </p>
+          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-4 drop-shadow-lg uppercase">
+            {t('gall_hero_title', 'OUR GALLERY')}
           </h1>
           <div className="w-24 h-1 mx-auto bg-[#E5C595]"></div>
         </div>
@@ -108,15 +118,15 @@ export default function Gallery() {
         <div className="container mx-auto px-6 flex justify-center flex-wrap gap-3">
           {categories.map((cat) => (
             <button
-              key={cat}
-              onClick={() => setFilter(cat)}
+              key={cat.key}
+              onClick={() => setFilter(cat.key)}
               className={`px-6 py-2 rounded-full text-xs md:text-sm font-bold uppercase tracking-widest transition-all duration-300 border ${
-                filter === cat 
+                filter === cat.key 
                   ? 'bg-[#E5C595] text-white border-[#E5C595] shadow-lg transform scale-105' 
                   : 'bg-transparent text-gray-400 border-gray-200 hover:border-[#E5C595] hover:text-[#E5C595]'
               }`}
             >
-              {cat}
+              {t(cat.transKey, cat.key)}
             </button>
           ))}
         </div>
@@ -140,7 +150,13 @@ export default function Gallery() {
               />
               
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center text-center p-2">
-                <p className="text-[#E5C595] text-[10px] font-bold uppercase tracking-widest mb-1">{img.category}</p>
+                <p className="text-[#E5C595] text-[10px] font-bold uppercase tracking-widest mb-1">
+                  {/* ดึงคำแปลของ Category มาแสดงบนรูปตอน Hover */}
+                  {img.category === 'All' ? t('filter_all', 'All') : 
+                   img.category === 'Hotel' ? t('filter_hotel', 'Hotel') : 
+                   img.category === 'Rooms' ? t('filter_rooms', 'Rooms') : 
+                   t('filter_facilities', 'Facilities')}
+                </p>
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white backdrop-blur-sm">
                   <ImageIcon size={16} />
                 </div>
@@ -152,7 +168,7 @@ export default function Gallery() {
 
       {/* --- LIGHTBOX --- */}
       {selectedImage && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setSelectedImage(null)}>
+        <div className="fixed inset-0 z-[60] bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setSelectedImage(null)}>
           <button className="absolute top-6 right-6 text-white hover:text-[#E5C595] transition-colors">
             <X size={40} />
           </button>
@@ -164,8 +180,14 @@ export default function Gallery() {
               className="w-full h-auto max-h-[85vh] object-contain rounded-sm shadow-2xl"
             />
             <div className="text-center mt-4">
+              {/* ชื่อรูป (Alt) คงเป็นภาษาอังกฤษไว้เพื่อความเท่ แต่หมวดหมู่เปลี่ยนตามภาษา */}
               <h3 className="text-white font-serif text-xl">{selectedImage.alt}</h3>
-              <p className="text-gray-400 text-sm uppercase tracking-widest mt-1">{selectedImage.category}</p>
+              <p className="text-gray-400 text-sm uppercase tracking-widest mt-1">
+                  {selectedImage.category === 'All' ? t('filter_all', 'All') : 
+                   selectedImage.category === 'Hotel' ? t('filter_hotel', 'Hotel') : 
+                   selectedImage.category === 'Rooms' ? t('filter_rooms', 'Rooms') : 
+                   t('filter_facilities', 'Facilities')}
+              </p>
             </div>
           </div>
         </div>
