@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { Plus, Minus, Calendar, Users, Search } from 'lucide-react';
@@ -15,6 +15,23 @@ export default function SearchPage() {
     children: 0
   });
 
+  // ✅ ดึงค่าเริ่มต้นจาก URL (ถ้ามี) มาใส่ในกล่องอัตโนมัติ
+  useEffect(() => {
+    if (router.isReady) {
+      const { checkIn: urlCheckIn, checkOut: urlCheckOut, adults: urlAdults, children: urlChildren, rooms: urlRooms } = router.query;
+      
+      if (urlCheckIn) setCheckIn(urlCheckIn);
+      if (urlCheckOut) setCheckOut(urlCheckOut);
+      
+      // อัปเดต State ถ้ามีการส่งค่าจำนวนคนหรือห้องมา
+      setCounters(prev => ({
+        rooms: urlRooms ? parseInt(urlRooms, 10) : prev.rooms,
+        adults: urlAdults ? parseInt(urlAdults, 10) : prev.adults,
+        children: urlChildren ? parseInt(urlChildren, 10) : prev.children
+      }));
+    }
+  }, [router.isReady, router.query]);
+
   const updateCounter = (key, type) => {
     setCounters(prev => ({
       ...prev,
@@ -24,9 +41,10 @@ export default function SearchPage() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // ส่งข้อมูลทั้งหมดไปที่หน้าเลือกห้องพัก (Step 2) ผ่าน URL Query
+    // ✅ เปลี่ยนจาก '/rooms-selection' เป็นชื่อไฟล์จริงที่คุณทำไว้ (เช่น '/rooms')
+    // สำคัญ: ต้องให้ชื่อนี้ตรงกับหน้าที่มี AI คำนวณราคา 10% ครับ
     router.push({
-      pathname: '/rooms-selection',
+      pathname: '/rooms-selection', 
       query: { 
         checkIn, 
         checkOut, 
@@ -63,6 +81,7 @@ export default function SearchPage() {
                 </label>
                 <input 
                   type="date" 
+                  value={checkIn} // ✅ ผูกค่ากับ State
                   className="w-full border-b border-gray-200 py-3 focus:border-[#E5C595] outline-none transition-all text-gray-700"
                   required
                   onChange={(e) => setCheckIn(e.target.value)}
@@ -74,6 +93,7 @@ export default function SearchPage() {
                 </label>
                 <input 
                   type="date" 
+                  value={checkOut} // ✅ ผูกค่ากับ State
                   className="w-full border-b border-gray-200 py-3 focus:border-[#E5C595] outline-none transition-all text-gray-700"
                   required
                   onChange={(e) => setCheckOut(e.target.value)}

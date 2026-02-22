@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { ChevronRight, Star, Wifi, Coffee, MapPin, ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/router'; // ✅ เพิ่ม useRouter สำหรับ Search Box
+import { ChevronRight, Star, Wifi, Coffee, MapPin, ArrowRight, Calendar, Users, Search } from 'lucide-react'; // ✅ เพิ่ม Icons สำหรับ Search Box
 import homepageData from '../data/homepage_data.json';
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const themeColor = '#E5C595';
+  
+  // ✅ เริ่มต้น State สำหรับ Search Box
+  const router = useRouter();
+  const [checkIn, setCheckIn] = useState('');
+  const [checkOut, setCheckOut] = useState('');
+  const [adults, setAdults] = useState(2);
+  const [children, setChildren] = useState(0);
 
   const heroImages = [
     "/images/hero/main.jpg",
@@ -34,8 +42,6 @@ export default function Home() {
 
   const { hotelInfo, heroSection, introSection } = homepageData;
 
-  // --- AI-READY: Structured Data (Schema.org) ---
-  // นี่คือ "บัตรประชาชนดิจิทัล" ที่จะทำให้ AI รู้จักโรงแรมเราครับ
   const hotelSchema = {
     "@context": "https://schema.org",
     "@type": "Hotel",
@@ -74,19 +80,33 @@ export default function Home() {
   };
 
   useEffect(() => {
+    // Timer สำหรับ Slide
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev === heroImages.length - 1 ? 0 : prev + 1));
     }, 5000);
+
+    // ✅ เซ็ตค่าเริ่มต้นให้ Search Box (Check-in วันนี้, Check-out พรุ่งนี้)
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    setCheckIn(today.toISOString().split('T')[0]);
+    setCheckOut(tomorrow.toISOString().split('T')[0]);
+
     return () => clearInterval(timer);
   }, []);
+
+  // ✅ ฟังก์ชันเมื่อกดปุ่มค้นหาในกล่อง Search Box
+  const handleSearch = (e) => {
+    e.preventDefault();
+    router.push(`/search?checkIn=${checkIn}&checkOut=${checkOut}&adults=${adults}&children=${children}`);
+  };
 
   return (
     <div className="font-sans text-gray-800 antialiased overflow-x-hidden">
       <Head>
         <title>{hotelInfo.name} - AI Ready Luxury Resort Phuket</title>
         <meta name="description" content="The Old Phuket: A unique blend of Sino-Portuguese heritage and modern luxury on Karon Beach. Book directly for the best rates." />
-        
-        {/* ✅ Inject Schema for AI Visibility */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(hotelSchema) }}
@@ -94,7 +114,7 @@ export default function Home() {
       </Head>
 
       {/* --- HERO SLIDESHOW --- */}
-      <div style={{ position: 'relative', height: '85vh', width: '100%', overflow: 'hidden', backgroundColor: '#000' }}>
+      <div style={{ position: 'relative', height: '100vh', minHeight: '800px', width: '100%', overflow: 'hidden', backgroundColor: '#000' }}>
         {heroImages.map((img, index) => (
           <div
             key={index}
@@ -108,22 +128,80 @@ export default function Home() {
           </div>
         ))}
 
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4" style={{ color: themeColor }}>
+        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 w-full" style={{ color: themeColor }}>
           <p className="text-sm uppercase tracking-[0.3em] mb-4 drop-shadow-md">{heroSection.welcomeText}</p>
-          <h1 className="text-4xl md:text-7xl font-serif font-bold mb-6 leading-tight drop-shadow-lg">
+          <h1 className="text-4xl md:text-7xl font-serif font-bold mb-6 leading-tight drop-shadow-lg text-white">
             {heroSection.titleLine1}<br/>
-            <span className="text-2xl md:text-5xl font-light">{heroSection.titleLine2}</span>
+            <span className="text-2xl md:text-5xl font-light text-[#E5C595]">{heroSection.titleLine2}</span>
           </h1>
-          <div className="w-24 h-1 mb-8 shadow-sm" style={{ backgroundColor: themeColor }}></div>
+          <div className="w-24 h-1 mb-16 shadow-sm" style={{ backgroundColor: themeColor }}></div>
           
-          <Link href="/accommodation">
-            <button 
-              className="border-2 px-8 py-3 uppercase tracking-widest font-semibold transition-all shadow-lg hover:bg-white hover:text-gray-900"
-              style={{ borderColor: themeColor, color: themeColor }}
-            >
-              {heroSection.buttonText}
-            </button>
-          </Link>
+          {/* ✅ SEARCH BOX COMPONENT (เพิ่มเข้ามาใหม่) */}
+          <div className="w-full max-w-5xl bg-black/40 backdrop-blur-md border border-white/20 p-6 md:p-8 rounded-sm shadow-2xl mt-4">
+            <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end text-left">
+              
+              <div className="flex flex-col">
+                <label className="text-white text-[10px] uppercase tracking-widest font-bold mb-2 flex items-center gap-2">
+                  <Calendar size={14} className="text-[#E5C595]"/> Check-in
+                </label>
+                <input 
+                  type="date" 
+                  value={checkIn}
+                  onChange={(e) => setCheckIn(e.target.value)}
+                  className="bg-white/95 text-gray-900 py-3 px-4 outline-none focus:ring-2 focus:ring-[#E5C595] text-sm font-bold rounded-sm transition-all w-full"
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-white text-[10px] uppercase tracking-widest font-bold mb-2 flex items-center gap-2">
+                  <Calendar size={14} className="text-[#E5C595]"/> Check-out
+                </label>
+                <input 
+                  type="date" 
+                  value={checkOut}
+                  onChange={(e) => setCheckOut(e.target.value)}
+                  className="bg-white/95 text-gray-900 py-3 px-4 outline-none focus:ring-2 focus:ring-[#E5C595] text-sm font-bold rounded-sm transition-all w-full"
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-white text-[10px] uppercase tracking-widest font-bold mb-2 flex items-center gap-2">
+                  <Users size={14} className="text-[#E5C595]"/> Adults
+                </label>
+                <select 
+                  value={adults}
+                  onChange={(e) => setAdults(Number(e.target.value))}
+                  className="bg-white/95 text-gray-900 py-3 px-4 outline-none focus:ring-2 focus:ring-[#E5C595] text-sm font-bold rounded-sm cursor-pointer w-full"
+                >
+                  {[1, 2, 3, 4, 5, 6].map(num => <option key={`adult-${num}`} value={num}>{num}</option>)}
+                </select>
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-white text-[10px] uppercase tracking-widest font-bold mb-2 flex items-center gap-2">
+                  <Users size={14} className="text-[#E5C595]"/> Children
+                </label>
+                <select 
+                  value={children}
+                  onChange={(e) => setChildren(Number(e.target.value))}
+                  className="bg-white/95 text-gray-900 py-3 px-4 outline-none focus:ring-2 focus:ring-[#E5C595] text-sm font-bold rounded-sm cursor-pointer w-full"
+                >
+                  {[0, 1, 2, 3, 4].map(num => <option key={`child-${num}`} value={num}>{num}</option>)}
+                </select>
+              </div>
+
+              <button 
+                type="submit"
+                className="bg-[#E5C595] hover:bg-[#d4b07e] text-gray-900 py-3 px-4 font-bold tracking-[0.2em] text-[10px] uppercase transition-all flex items-center justify-center gap-2 rounded-sm shadow-lg h-[44px] md:h-[48px] w-full"
+              >
+                <Search size={16} /> Check Rates
+              </button>
+
+            </form>
+          </div>
+
         </div>
       </div>
 

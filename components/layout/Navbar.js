@@ -89,8 +89,8 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Book Now */}
-            <Link href={`${linkPrefix}/accommodation`}>
+            {/* ✅ แก้ไข: Book Now ให้ชี้ไปหน้า /search */}
+            <Link href={`${linkPrefix}/search`}>
                <button className="bg-[#E5C595] hover:bg-[#d4b07e] text-white px-3 py-1.5 md:px-6 md:py-2 uppercase text-[10px] md:text-xs font-bold tracking-widest rounded-sm transition-all shadow-md border border-transparent whitespace-nowrap">
                  {isThai ? 'จองห้องพัก' : 'Book Now'}
                </button>
