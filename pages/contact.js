@@ -11,7 +11,7 @@ export default function Contact() {
     "@type": "Hotel",
     "name": "The Old Phuket",
     "image": "https://theoldphuket.vercel.app/images/hotel/reception-03.jpg",
-    "telephone": "+6676123456",
+    "telephone": "+6676123455",
     "email": "info@theoldphuket.com",
     "url": "https://theoldphuket.vercel.app/contact",
     "address": {
