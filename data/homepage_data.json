@@ -1,0 +1,22 @@
+{
+  "hotelInfo": {
+    "name": "The Old Phuket",
+    "slogan": "Sino-Portuguese Charm on Karon Beach"
+  },
+  "heroSection": {
+    "heroImages": [
+      "/images/hero/main.jpg",
+      "/images/hero/main02.jpg",
+      "/images/hero/main03.jpg"
+    ],
+    "welcomeText": "Welcome to Karon Beach",
+    "titleLine1": "THE OLD PHUKET",
+    "titleLine2": "KARON BEACH RESORT",
+    "buttonText": "Discover More"
+  },
+  "introSection": {
+    "title": "\"Timeless Memories\"",
+    "description": "Experience the perfect blend of traditional Sino-Portuguese architecture and modern luxury.",
+    "linkText": "View Our Rooms"
+  }
+}

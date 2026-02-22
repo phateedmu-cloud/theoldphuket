@@ -1,0 +1,27 @@
+{
+  "hotelName": "The Old Phuket Karon Beach Resort",
+  "description_th": "โรงแรมแห่งนี้ผสมผสานมรดก ความทันสมัย และบรรยากาศที่สร้างความสวยงามโดดเด่น ตั้งอยู่ใจกลางหาดกะรนที่สวยงามที่สุดของเมือง ให้ความสะดวกสบายในการช้อปปิ้งและร้านอาหาร",
+  "description_en": "Heritage, modernism and atmosphere combines to create a striking beauty in the heart of Karon beach. The Old Phuket offers unique accommodation spread over two distinct wings, catering to diverse preferences.",
+  "amenities": [
+    "Swimming Pools",
+    "Table Tennis",
+    "Fitness facility",
+    "Mini library",
+    "Internet",
+    "Games room",
+    "Restaurant",
+    "Shopping nearby",
+    "Sino Wing accommodation",
+    "Serene Wing accommodation"
+  ],
+  "contact_info": {
+    "phone": "+66 76 396 353-6, +66 86 952 4577",
+    "email": "reservation@theoldphuket.com, sales@azphuket.com",
+    "address": "192/36 Karon Rd.,Karon Beach, Muang, Phuket 83100, Thailand"
+  },
+  "selling_points": [
+    "Unique accommodation in two distinct wings: Sino and Serene.",
+    "Located in the heart of Karon Beach, close to shopping and restaurants.",
+    "Offers a blend of heritage and modern comfort with Sino-Portuguese architecture."
+  ]
+}

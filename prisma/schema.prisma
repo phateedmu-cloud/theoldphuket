@@ -1,0 +1,44 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // ใช้ตัวแปรนี้เพื่อให้ดึงค่าจากไฟล์ .env ของคุณเอกได้โดยตรง
+  url      = env("POSTGRES_PRISMA_URL")
+}
+
+// 1. ตารางเก็บข้อมูลประเภทห้องพัก
+model RoomType {
+  id          String    @id @default(cuid())
+  name        String    
+  slug        String    @unique 
+  price       Int       
+  description String?   
+  size        Int       
+  guests      Int       
+  totalStock  Int       @default(5) 
+  images      String[]  
+  bookings    Booking[] 
+  createdAt   DateTime  @default(now())
+}
+
+// 2. ตารางเก็บใบจอง
+model Booking {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now()) 
+  
+  customerName  String
+  customerEmail String
+  customerPhone String
+  
+  checkIn       DateTime
+  checkOut      DateTime
+  totalPrice    Int      
+  status        String   @default("pending") 
+  
+  roomTypeId    String
+  roomType      RoomType @relation(fields: [roomTypeId], references: [id])
+}

@@ -1,0 +1,23 @@
+{
+  "hotelName": "The Old Phuket Karon Beach Resort",
+  "description_th": "โรงแรมเก่าภูเก็ต กะรน บีช รีสอร์ท ผสมผสานความเก่าแก่และความทันสมัยอย่างลงตัว มอบประสบการณ์การพักผ่อนที่ไม่เหมือนใครในบรรยากาศที่อบอุ่น",
+  "description_en": "Heritage, modernism, and atmosphere combine to create a striking beauty in the heart of Karon Beach. The resort provides guests with a unique holiday experience offering both traditional and modern accommodations.",
+  "amenities": [
+    "Swimming Pools",
+    "Table Tennis",
+    "Fitness Facility",
+    "Mini Library",
+    "Internet Access",
+    "Games Room"
+  ],
+  "contact_info": {
+    "phone": "+66 76 396 353-6, +66 86 952 4577",
+    "email": "reservation@theoldphuket.com, sales@azphuket.com",
+    "address": "192/36 Karon Rd.,Karon Beach, Muang, Phuket 83100, Thailand"
+  },
+  "selling_points": [
+    "Sino-Portuguese architecture",
+    "Two distinct accommodation wings",
+    "Walking distance to Karon Beach"
+  ]
+}
