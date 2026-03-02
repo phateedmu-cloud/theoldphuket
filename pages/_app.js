@@ -1,5 +1,7 @@
 import '../styles/globals.css';
 import Layout from '../components/layout/Layout';
+// ✅ 1. นำเข้า ChatWidget ที่เราเพิ่งสร้าง
+import ChatWidget from '../components/ChatWidget';
 // ✅ เพิ่มการนำเข้า LanguageProvider
 import { LanguageProvider } from '../context/LanguageContext'; 
 
@@ -29,6 +31,8 @@ function MyApp({ Component, pageProps }) {
         <Layout>
           <Component {...pageProps} />
         </Layout>
+        {/* ✅ 5. ฝัง ChatWidget ไว้ตรงนี้ เพื่อให้โชว์ทุกหน้าของเว็บไซต์ */}
+        <ChatWidget />
       </div>
     </LanguageProvider>
   );
